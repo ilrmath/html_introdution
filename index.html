@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>13分でつくる HTML＋CSS 自己紹介ページ</title>
+  <style>
+    :root {
+      --orange: #ff8736;
+      --coral: #fa5d74;
+      --deep: #9f3b00;
+      --yellow: #ffe500;
+      --yellow-soft: #fff8aa;
+      --cream: #fffaf4;
+      --orange-soft: #fff0e4;
+      --ink: #352a25;
+      --muted: #78665d;
+      --line: #efd0bb;
+      --green: #16865a;
+      --green-soft: #effff7;
+      --shadow: 0 16px 40px rgba(159, 59, 0, .22), 0 0 0 1px rgba(255, 229, 0, .55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--cream);
+    }
+
+    body {
+      min-width: 900px;
+      display: grid;
+      grid-template-columns: 50% 50%;
+      background:
+        radial-gradient(circle at 8% 8%, rgba(255, 229, 0, .15), transparent 23%),
+        linear-gradient(135deg, #fff9f2, #fff 55%, #fff7ef);
+    }
+
+    button, textarea { font: inherit; }
+
+    .panel {
+      min-width: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .preview-panel { border-right: 4px solid var(--yellow); }
+
+    .top-bar {
+      min-height: 54px;
+      flex: 0 0 auto;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), var(--coral));
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .top-title {
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .top-title small {
+      margin-left: 7px;
+      font-size: 11px;
+      font-weight: 700;
+      opacity: .92;
+    }
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex: 0 0 auto;
+    }
+
+    .timer {
+      min-width: 72px;
+      padding: 5px 8px;
+      border: 2px solid rgba(255,255,255,.72);
+      border-radius: 9px;
+      background: rgba(255,255,255,.18);
+      text-align: center;
+      font: 900 16px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .tool-button {
+      min-height: 34px;
+      padding: 6px 10px;
+      border: 2px solid rgba(255,255,255,.82);
+      border-radius: 9px;
+      color: var(--deep);
+      background: var(--yellow);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(255, 229, 0, .42);
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    .tool-button:hover { transform: translateY(-1px); background: #fff; }
+    .tool-button.subtle { color: #fff; background: rgba(255,255,255,.16); }
+
+    .preview-wrap {
+      min-height: 0;
+      flex: 1;
+      padding: 22px;
+      overflow: auto;
+      background:
+        linear-gradient(rgba(255, 135, 54, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 135, 54, .045) 1px, transparent 1px),
+        #fff;
+      background-size: 24px 24px;
+    }
+
+    #previewFrame {
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      border: 0;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 9px 25px rgba(68, 45, 31, .12);
+    }
+
+    .lesson-bar {
+      min-height: 54px;
+      padding: 8px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), var(--coral));
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .lesson-name { min-width: 0; font-weight: 900; line-height: 1.25; }
+    .lesson-name span { display: block; font-size: 15px; }
+    .lesson-name small { display: block; margin-top: 2px; font-size: 11px; opacity: .92; }
+
+    .progress-box {
+      min-width: 115px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .progress-track {
+      width: 115px;
+      height: 8px;
+      margin-top: 4px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.35);
+    }
+
+    #progressBar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--yellow);
+      transition: width .25s ease;
+    }
+
+    .editors {
+      min-height: 0;
+      flex: 1;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+    }
+
+    .editor-block {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .editor-block:first-child { border-bottom: 4px solid var(--yellow); }
+
+    .editor-head {
+      min-height: 42px;
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(90deg, var(--orange-soft), #fff9f2);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .editor-head strong { color: var(--deep); font-size: 14px; }
+    .editor-head span { color: var(--muted); font-size: 11px; font-weight: 700; }
+
+    .editor-shell {
+      min-height: 0;
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .line-numbers {
+      width: 44px;
+      flex: 0 0 auto;
+      padding: 12px 7px 12px 3px;
+      overflow: hidden;
+      white-space: pre;
+      user-select: none;
+      text-align: right;
+      color: var(--deep);
+      background: linear-gradient(180deg, var(--yellow-soft), #fffbe0);
+      border-right: 2px solid var(--yellow);
+      font: 800 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    textarea {
+      min-width: 0;
+      min-height: 0;
+      flex: 1;
+      width: 100%;
+      padding: 12px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      color: #3d332e;
+      background: #fff;
+      white-space: pre;
+      tab-size: 2;
+      font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      caret-color: var(--orange);
+    }
+
+    textarea:focus {
+      background: #fffefd;
+      box-shadow: inset 0 0 0 3px rgba(255, 135, 54, .16);
+    }
+
+    #taskPanel {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 50;
+      width: min(455px, calc(100vw - 44px));
+      max-height: min(74vh, 680px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 3px solid var(--yellow);
+      border-radius: 16px;
+      background: rgba(255,255,255,.98);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    #taskPanel.minimized { width: 235px; max-height: none; }
+    #taskPanel.minimized .task-body { display: none; }
+
+    .task-header {
+      min-height: 49px;
+      padding: 8px 9px 8px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), var(--coral));
+      border-bottom: 4px solid var(--yellow);
+    }
+
+    .task-header:active { cursor: grabbing; }
+    .task-title { font-size: 15px; font-weight: 900; }
+
+    .mini-button {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 2px solid rgba(255,255,255,.8);
+      border-radius: 8px;
+      color: var(--deep);
+      background: var(--yellow);
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .task-body {
+      padding: 11px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background: linear-gradient(180deg, rgba(255, 135, 54, .07), transparent 100px), #fff;
+    }
+
+    .mission {
+      margin: 0 0 9px;
+      padding: 8px 10px;
+      border-left: 5px solid var(--yellow);
+      border-radius: 7px;
+      color: var(--muted);
+      background: var(--orange-soft);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .task-item {
+      margin-bottom: 7px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(159,59,0,.05);
+      transition: border-color .2s, background .2s, opacity .2s, transform .2s;
+    }
+
+    .task-item:last-of-type { margin-bottom: 0; }
+
+    .task-item.current {
+      border: 2px solid var(--orange);
+      background: #fffaf5;
+      transform: translateY(-1px);
+    }
+
+    .task-main {
+      display: grid;
+      grid-template-columns: 26px minmax(0,1fr) 24px;
+      gap: 7px;
+      align-items: start;
+    }
+
+    .task-no {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--orange);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .task-text {
+      min-width: 0;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .task-text code,
+    .answer-line code,
+    .hint code {
+      padding: 1px 5px;
+      border-radius: 5px;
+      color: #733500;
+      background: var(--yellow-soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .status-dot {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #d9c8bc;
+      border-radius: 50%;
+      color: transparent;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .answer-line {
+      margin: 7px 0 0 33px;
+      padding: 6px 8px;
+      border-left: 4px solid var(--yellow);
+      border-radius: 6px;
+      color: #59463b;
+      background: #fffdf1;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .task-item.done {
+      border-color: #76d5ad;
+      background: var(--green-soft);
+    }
+
+    .task-item.done .task-no { background: var(--green); }
+    .task-item.done .status-dot { border-color: var(--green); color: var(--green); }
+    .task-item.done .answer-line { opacity: .72; }
+
+    .hint-toggle {
+      margin: 6px 0 0 33px;
+      padding: 0;
+      border: 0;
+      color: var(--deep);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 900;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .hint {
+      display: none;
+      margin: 5px 0 0 33px;
+      padding: 7px 8px;
+      border-left: 4px solid var(--orange);
+      border-radius: 6px;
+      color: #75401e;
+      background: var(--orange-soft);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .hint.open { display: block; }
+
+    .complete-banner {
+      display: none;
+      margin-top: 9px;
+      padding: 10px;
+      border: 2px solid #68cca3;
+      border-radius: 11px;
+      color: #09613c;
+      background: #eafff4;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .complete-banner.show { display: block; animation: pop .35s ease; }
+
+    .quiz-link {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      color: #fff;
+      background: #087f5b;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 900;
+      box-shadow: 0 3px 0 #056747;
+    }
+
+    .quiz-link:hover { background: #076f50; }
+    .quiz-link:active { transform: translateY(2px); box-shadow: 0 1px 0 #056747; }
+    .quiz-link:focus-visible { outline: 3px solid #ffb347; outline-offset: 3px; }
+
+    @keyframes pop {
+      0% { transform: scale(.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-height: 720px) {
+      #taskPanel { right: 12px; bottom: 12px; max-height: 64vh; }
+      .top-bar, .lesson-bar { min-height: 48px; padding-top: 6px; padding-bottom: 6px; }
+      .editor-head { min-height: 36px; }
+      textarea, .line-numbers { font-size: 13px; }
+    }
+  </style>
+<script type="text/javascript" nonce="27dcfb9564a3402a9e0cc61cf40" src="//local.adguard.org?ts=1782347558285&amp;type=content-script&amp;dmn=chatgpt.com&amp;url=https%3A%2F%2Fchatgpt.com%2Fbackend-api%2Festuary%2Fcontent%3Fid%3Dfile_00000000a3487209b5e37f0aca11b0be%26fn%3DHTML_CSS_13%25E5%2588%2586_%25E6%2596%2587%25E7%25AB%25A0%25E5%2585%25A5%25E5%258A%259B%25E7%2589%2588_%25E4%25BF%25AE%25E6%25AD%25A3%25E7%2589%2588.html%26cd%3Dattachment%26ts%3D495097%26p%3Dfs%26cid%3D1%26sig%3D8f754e476af2a5045d713a2d3c5a38fba65c39543377a1d54d3ede8d24c71474%26v%3D0&amp;app=com.microsoft.edgemac&amp;css=2&amp;js=1&amp;rel=1&amp;rji=1&amp;sbe=1&amp;stealth=1&amp;st-push&amp;st-loc&amp;st-java&amp;st-dnt"></script><script type="text/javascript" nonce="27dcfb9564a3402a9e0cc61cf40" src="//local.adguard.org?ts=1782347558285&amp;name=AdGuard%20Extra&amp;type=user-script"></script></head>
+<body>
+  <section class="panel preview-panel" aria-label="プレビュー">
+    <header class="top-bar">
+      <div class="top-title">👀 プレビュー <small>入力するとすぐ変化</small></div>
+      <div class="tools">
+        <div class="timer" id="timer">13:00</div>
+        <button class="tool-button" id="timerButton" type="button">スタート</button>
+        <button class="tool-button subtle" id="resetButton" type="button">リセット</button>
+      </div>
+    </header>
+    <div class="preview-wrap">
+      <iframe id="previewFrame" title="作成したページのプレビュー" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
+  </section>
+
+  <main class="panel">
+    <header class="lesson-bar">
+      <div class="lesson-name">
+        <span>13分でつくる HTML＋CSS</span>
+        <small>自分の文章を入れて、紹介ページを完成させよう</small>
+      </div>
+      <div class="progress-box">
+        <span id="progressText">0 / 13 完了</span>
+        <div class="progress-track"><div id="progressBar"></div></div>
+      </div>
+    </header>
+
+    <div class="editors">
+      <section class="editor-block" aria-label="HTMLエリア">
+        <div class="editor-head">
+          <strong>📝 HTMLエリア</strong>
+          <span>見出し・自分の文章・リンク</span>
+        </div>
+        <div class="editor-shell">
+          <div class="line-numbers" id="htmlLines"></div>
+          <textarea id="htmlInput" spellcheck="false" aria-label="HTML入力欄"><h1>わたしの紹介ページ</h1>
+<h2>好きなもの</h2>
+<p></p>
+<h2>最近がんばっていること</h2>
+<p></p>
+<h2>高校生活でやってみたいこと</h2>
+<p></p>
+<a href="">おすすめのWebサイト</a></textarea>
+        </div>
+      </section>
+
+      <section class="editor-block" aria-label="CSSエリア">
+        <div class="editor-head">
+          <strong>🎨 CSSエリア</strong>
+          <span>文字色・背景・余白・境界線</span>
+        </div>
+        <div class="editor-shell">
+          <div class="line-numbers" id="cssLines"></div>
+          <textarea id="cssInput" spellcheck="false" aria-label="CSS入力欄">h1 {
+  color:
+  text-align:
+}
+h2 {
+  background-color:
+  padding:
+  border-bottom:
+}
+p {
+  line-height:
+}
+a {
+  color:
+}</textarea>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside id="taskPanel" aria-label="課題一覧">
+    <div class="task-header" id="taskHandle">
+      <div class="task-title">💡 上から順に修正</div>
+      <button type="button" class="mini-button" id="minimizeButton" aria-label="最小化">−</button>
+    </div>
+    <div class="task-body">
+      <p class="mission">全13課題です。赤い枠から進めます。文章は自分で考え、正しく入力できると自動で ✓ がつきます。</p>
+
+      <div class="task-item" data-task="title">
+        <div class="task-main">
+          <span class="task-no">1</span>
+          <span class="task-text">HTMLの <strong>1行目</strong>の題名を、自分用に書きかえる</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>&lt;h1&gt;○○の紹介ページ&lt;/h1&gt;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint">本名でなくても構いません。今の「わたしの紹介ページ」とは別の題名にします。</div>
+      </div>
+
+      <div class="task-item" data-task="paragraph1">
+        <div class="task-main">
+          <span class="task-no">2</span>
+          <span class="task-text">HTMLの <strong>3行目</strong>に、好きなものを <strong>12文字以上</strong>で書く</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>&lt;p&gt;私は音楽を聴くことが好きです。&lt;/p&gt;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>&lt;p&gt;</code> と <code>&lt;/p&gt;</code> の間に、自分の文章を書きます。</div>
+      </div>
+
+      <div class="task-item" data-task="paragraph2">
+        <div class="task-main">
+          <span class="task-no">3</span>
+          <span class="task-text">HTMLの <strong>5行目</strong>に、最近がんばっていることを <strong>12文字以上</strong>で書く</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>&lt;p&gt;毎日少しずつ英単語を覚えています。&lt;/p&gt;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint">内容は自由です。部活動、勉強、趣味などから一つ選びましょう。</div>
+      </div>
+
+      <div class="task-item" data-task="paragraph3">
+        <div class="task-main">
+          <span class="task-no">4</span>
+          <span class="task-text">HTMLの <strong>7行目</strong>に、高校生活でやってみたいことを <strong>12文字以上</strong>で書く</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>&lt;p&gt;文化祭で新しい企画に挑戦したいです。&lt;/p&gt;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint">将来の目標でなくても構いません。高校生活の中で考えます。</div>
+      </div>
+
+      <div class="task-item" data-task="linkUrl">
+        <div class="task-main">
+          <span class="task-no">5</span>
+          <span class="task-text">HTMLの <strong>8行目</strong>の <code>href=""</code> に、下のURLを入力する</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>href="https://www.yahoo.co.jp"</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>href</code> は、クリックしたときの移動先です。<code>https://</code> からすべて入力します。</div>
+      </div>
+
+      <div class="task-item" data-task="linkText">
+        <div class="task-main">
+          <span class="task-no">6</span>
+          <span class="task-text">HTMLの <strong>8行目</strong>の「おすすめのWebサイト」を、別の言葉に変える</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>&gt;よく使う検索サイト&lt;/a&gt;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>&lt;a ...&gt;</code> と <code>&lt;/a&gt;</code> の間が、画面に表示される文字です。</div>
+      </div>
+
+      <div class="task-item" data-task="h1Color">
+        <div class="task-main">
+          <span class="task-no">7</span>
+          <span class="task-text">CSSの <strong>2行目</strong>で、大見出しを濃いオレンジ色にする</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>color: darkorange;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>h1</code> は、HTMLの1行目に書かれている大見出しを表します。</div>
+      </div>
+
+      <div class="task-item" data-task="h1Center">
+        <div class="task-main">
+          <span class="task-no">8</span>
+          <span class="task-text">CSSの <strong>3行目</strong>で、大見出しを中央にそろえる</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>text-align: center;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>text-align</code> は文字の横方向の位置を指定します。</div>
+      </div>
+
+      <div class="task-item" data-task="h2Background">
+        <div class="task-main">
+          <span class="task-no">9</span>
+          <span class="task-text">CSSの <strong>6行目</strong>で、中見出しの背景を薄いオレンジ色にする</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>background-color: #fff7e6;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>h2</code> は、HTMLの2・4・6行目にある3つの中見出しです。</div>
+      </div>
+
+      <div class="task-item" data-task="h2Padding">
+        <div class="task-main">
+          <span class="task-no">10</span>
+          <span class="task-text">CSSの <strong>7行目</strong>で、中見出しの文字のまわりに8pxの余白をつける</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>padding: 8px;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>padding</code> は、文字と背景の端との間に内側の余白をつくります。</div>
+      </div>
+
+      <div class="task-item" data-task="h2Border">
+        <div class="task-main">
+          <span class="task-no">11</span>
+          <span class="task-text">CSSの <strong>8行目</strong>で、中見出しの下に線をつける</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>border-bottom: 2px solid orange;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>2px</code> は太さ、<code>solid</code> は実線、<code>orange</code> は色です。</div>
+      </div>
+
+      <div class="task-item" data-task="paragraphLineHeight">
+        <div class="task-main">
+          <span class="task-no">12</span>
+          <span class="task-text">CSSの <strong>11行目</strong>で、段落の行間を1.8にする</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>line-height: 1.8;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>p</code> は、HTMLの3・5・7行目に書いた3つの文章を表します。</div>
+      </div>
+
+      <div class="task-item" data-task="linkColor">
+        <div class="task-main">
+          <span class="task-no">13</span>
+          <span class="task-text">CSSの <strong>14行目</strong>で、リンクの文字を緑色にする</span>
+          <span class="status-dot">✓</span>
+        </div>
+        <div class="answer-line"><code>color: green;</code></div>
+        <button class="hint-toggle" type="button">説明を見る</button>
+        <div class="hint"><code>a</code> は、HTMLの8行目に書かれているリンクを表します。</div>
+      </div>
+
+      <div class="complete-banner" id="completeBanner">
+        🎉 完成！ 自分の文章にHTMLで意味をつけ、CSSで見た目を整えられました。<br>
+        <a class="quiz-link"
+          href="https://docs.google.com/forms/d/e/1FAIpQLScjccJX3h-QV4dqA2e0ireV3sYpllxqrTp5S9UDPzd6FgisGw/viewform?usp=header"
+          target="_blank"
+          rel="noopener noreferrer">確認テストへ進む →</a>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    const initialHtml = `<h1>わたしの紹介ページ</h1>
+<h2>好きなもの</h2>
+<p></p>
+<h2>最近がんばっていること</h2>
+<p></p>
+<h2>高校生活でやってみたいこと</h2>
+<p></p>
+<a href="">おすすめのWebサイト</a>`;
+
+    const initialCss = `h1 {
+  color:
+  text-align:
+}
+h2 {
+  background-color:
+  padding:
+  border-bottom:
+}
+p {
+  line-height:
+}
+a {
+  color:
+}`;
+
+    const htmlInput = document.getElementById('htmlInput');
+    const cssInput = document.getElementById('cssInput');
+    const htmlLines = document.getElementById('htmlLines');
+    const cssLines = document.getElementById('cssLines');
+    const previewFrame = document.getElementById('previewFrame');
+    const taskItems = [...document.querySelectorAll('.task-item')];
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const completeBanner = document.getElementById('completeBanner');
+
+    function updateLineNumbers(textarea, box) {
+      const count = textarea.value.split('\n').length;
+      box.textContent = Array.from({ length: count }, (_, i) => `${i + 1})`).join('\n');
+      box.scrollTop = textarea.scrollTop;
+    }
+
+    function safeHtml(html) {
+      return html
+        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+        .replace(/\son\w+\s*=\s*(["']).*?\1/gi, '');
+    }
+
+    function updatePreview() {
+      const html = safeHtml(htmlInput.value);
+      const css = cssInput.value.replace(/<\/style/gi, '<\\/style');
+      previewFrame.srcdoc = `<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><base target="_blank">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; padding: 20px; font-family: "Yu Gothic", "Meiryo", sans-serif; color: #302925; background: #fff; }
+  h1 { margin-top: 0; }
+  h2 { margin-top: 24px; padding: 6px 2px; }
+  p { min-height: 1.5em; }
+  a { display: inline-block; margin-top: 12px; font-weight: 800; }
+  ${css}
+</style></head><body>${html}</body></html>`;
+    }
+
+    function normalized(value) {
+      return value.replace(/\s+/g, ' ').trim().toLowerCase();
+    }
+
+    function plainText(value) {
+      const box = document.createElement('div');
+      box.innerHTML = value;
+      return (box.textContent || '').replace(/\s+/g, '').trim();
+    }
+
+    function getTaskState() {
+      const htmlSource = htmlInput.value;
+      const css = normalized(cssInput.value);
+
+      const titleMatch = htmlSource.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+      const titleText = titleMatch ? plainText(titleMatch[1]) : '';
+
+      const paragraphs = [...htmlSource.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
+        .map(match => plainText(match[1]));
+
+      const linkMatch = htmlSource.match(/<a\b([^>]*)>([\s\S]*?)<\/a>/i);
+      const linkAttributes = linkMatch ? linkMatch[1] : '';
+      const linkLabel = linkMatch ? plainText(linkMatch[2]) : '';
+
+      return {
+        title: titleText.length >= 2 && titleText !== 'わたしの紹介ページ',
+        paragraph1: (paragraphs[0] || '').length >= 12,
+        paragraph2: (paragraphs[1] || '').length >= 12,
+        paragraph3: (paragraphs[2] || '').length >= 12,
+        linkUrl: /href\s*=\s*["']https:\/\/www\.yahoo\.co\.jp\/?["']/i.test(linkAttributes),
+        linkText: linkLabel.length >= 3 && linkLabel !== 'おすすめのWebサイト',
+        h1Color: /h1\s*\{[^}]*color\s*:\s*darkorange\s*;[^}]*\}/.test(css),
+        h1Center: /h1\s*\{[^}]*text-align\s*:\s*center\s*;[^}]*\}/.test(css),
+        h2Background: /h2\s*\{[^}]*background-color\s*:\s*#fff7e6\s*;[^}]*\}/.test(css),
+        h2Padding: /h2\s*\{[^}]*padding\s*:\s*8px\s*;[^}]*\}/.test(css),
+        h2Border: /h2\s*\{[^}]*border-bottom\s*:\s*2px\s+solid\s+orange\s*;[^}]*\}/.test(css),
+        paragraphLineHeight: /p\s*\{[^}]*line-height\s*:\s*1\.8\s*;[^}]*\}/.test(css),
+        linkColor: /a\s*\{[^}]*color\s*:\s*green\s*;[^}]*\}/.test(css)
+      };
+    }
+
+    function updateTasks() {
+      const state = getTaskState();
+      let done = 0;
+      let currentSet = false;
+
+      taskItems.forEach(item => {
+        const complete = Boolean(state[item.dataset.task]);
+        item.classList.toggle('done', complete);
+        item.classList.remove('current');
+        if (complete) {
+          done++;
+        } else if (!currentSet) {
+          item.classList.add('current');
+          currentSet = true;
+        }
+      });
+
+      progressText.textContent = `${done} / ${taskItems.length} 完了`;
+      progressBar.style.width = `${(done / taskItems.length) * 100}%`;
+      completeBanner.classList.toggle('show', done === taskItems.length);
+    }
+
+    function refresh() {
+      updateLineNumbers(htmlInput, htmlLines);
+      updateLineNumbers(cssInput, cssLines);
+      updatePreview();
+      updateTasks();
+    }
+
+    htmlInput.addEventListener('input', refresh);
+    cssInput.addEventListener('input', refresh);
+    htmlInput.addEventListener('scroll', () => { htmlLines.scrollTop = htmlInput.scrollTop; });
+    cssInput.addEventListener('scroll', () => { cssLines.scrollTop = cssInput.scrollTop; });
+
+    document.querySelectorAll('.hint-toggle').forEach(button => {
+      button.addEventListener('click', () => {
+        const hint = button.nextElementSibling;
+        const isOpen = hint.classList.toggle('open');
+        button.textContent = isOpen ? '説明を閉じる' : '説明を見る';
+      });
+    });
+
+    const timer = document.getElementById('timer');
+    const timerButton = document.getElementById('timerButton');
+    let remaining = 13 * 60;
+    let timerId = null;
+
+    function showTime() {
+      const min = Math.floor(remaining / 60).toString().padStart(2, '0');
+      const sec = (remaining % 60).toString().padStart(2, '0');
+      timer.textContent = `${min}:${sec}`;
+    }
+
+    timerButton.addEventListener('click', () => {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+        timerButton.textContent = '再開';
+        return;
+      }
+      if (remaining <= 0) remaining = 13 * 60;
+      timerButton.textContent = '一時停止';
+      timerId = setInterval(() => {
+        remaining--;
+        showTime();
+        if (remaining <= 0) {
+          clearInterval(timerId);
+          timerId = null;
+          timerButton.textContent = 'もう一度';
+          timer.style.background = '#fff';
+          timer.style.color = '#9f3b00';
+        }
+      }, 1000);
+    });
+
+    document.getElementById('resetButton').addEventListener('click', () => {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      htmlInput.value = initialHtml;
+      cssInput.value = initialCss;
+      remaining = 13 * 60;
+      timerButton.textContent = 'スタート';
+      timer.removeAttribute('style');
+      showTime();
+      refresh();
+    });
+
+    const taskPanel = document.getElementById('taskPanel');
+    const taskHandle = document.getElementById('taskHandle');
+    const minimizeButton = document.getElementById('minimizeButton');
+    let drag = null;
+
+    minimizeButton.addEventListener('click', event => {
+      event.stopPropagation();
+      const minimized = taskPanel.classList.toggle('minimized');
+      minimizeButton.textContent = minimized ? '+' : '−';
+      minimizeButton.setAttribute('aria-label', minimized ? '元の大きさに戻す' : '最小化');
+    });
+
+    taskHandle.addEventListener('pointerdown', event => {
+      if (event.target.closest('button')) return;
+      const rect = taskPanel.getBoundingClientRect();
+      drag = { id: event.pointerId, dx: event.clientX - rect.left, dy: event.clientY - rect.top };
+      taskPanel.style.left = `${rect.left}px`;
+      taskPanel.style.top = `${rect.top}px`;
+      taskPanel.style.right = 'auto';
+      taskPanel.style.bottom = 'auto';
+      taskHandle.setPointerCapture(event.pointerId);
+    });
+
+    taskHandle.addEventListener('pointermove', event => {
+      if (!drag || drag.id !== event.pointerId) return;
+      const maxLeft = Math.max(0, window.innerWidth - taskPanel.offsetWidth);
+      const maxTop = Math.max(0, window.innerHeight - taskPanel.offsetHeight);
+      taskPanel.style.left = `${Math.min(Math.max(0, event.clientX - drag.dx), maxLeft)}px`;
+      taskPanel.style.top = `${Math.min(Math.max(0, event.clientY - drag.dy), maxTop)}px`;
+    });
+
+    function stopDrag(event) {
+      if (drag && drag.id === event.pointerId) drag = null;
+    }
+
+    taskHandle.addEventListener('pointerup', stopDrag);
+    taskHandle.addEventListener('pointercancel', stopDrag);
+
+    taskHandle.addEventListener('dblclick', event => {
+      if (event.target.closest('button')) return;
+      taskPanel.style.left = 'auto';
+      taskPanel.style.top = 'auto';
+      taskPanel.style.right = '22px';
+      taskPanel.style.bottom = '22px';
+    });
+
+    window.addEventListener('keydown', event => {
+      if (event.altKey && event.key.toLowerCase() === 'r') {
+        event.preventDefault();
+        htmlInput.value = initialHtml;
+        cssInput.value = initialCss;
+        remaining = 13 * 60;
+        showTime();
+        refresh();
+      }
+    });
+
+    showTime();
+    refresh();
+  </script>
+</body>
+</html>
